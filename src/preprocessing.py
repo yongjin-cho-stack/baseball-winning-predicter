@@ -96,6 +96,20 @@ def build_game_features(raw_path: str) -> pd.DataFrame:
     # 홈 어드밴티지 피처 추가
     merged["home_advantage"] = 1
 
+    # 선발 투수 스탯 추가
+    starter_cols = ["starter_era", "starter_k", "starter_bb", "starter_h", "starter_er", "starter_ip"]
+    for side in ("home", "away"):
+        src = df[["game_date", f"{side}_team"] + [f"{side}_{c}" for c in starter_cols]].copy()
+        src = src.rename(columns={f"{side}_{c}": f"{side}_{c}" for c in starter_cols})
+        src["key"] = src["game_date"].astype(str) + "_" + src[f"{side}_team"]
+        src = src.set_index("key")[[f"{side}_{c}" for c in starter_cols]]
+        for c in starter_cols:
+            src[f"{side}_{c}"] = pd.to_numeric(src[f"{side}_{c}"], errors="coerce")
+        key_col = f"{side}_team"
+        merged[f"{side}_key"] = merged["game_date"].astype(str) + "_" + merged[f"{side}_team"]
+        merged = merged.join(src, on=f"{side}_key").drop(columns=[f"{side}_key"])
+
+    merged = merged.dropna()
     return merged
 
 

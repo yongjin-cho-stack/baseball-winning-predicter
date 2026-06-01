@@ -92,12 +92,14 @@ def collect(start_date: str, end_date: str, delay: float = 0.1) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    # 2025 시즌 수집 후 기존 2023 데이터에 합치기
-    print("\n=== 2025 시즌 수집 중 ===")
-    df_2025 = collect("2025-03-27", "2025-09-28")
+    # 2023 시즌 재수집 (선발 투수 스탯 포함) 후 2025와 합치기
+    print("\n=== 2023 시즌 수집 중 (선발 투수 스탯 포함) ===")
+    df_2023 = collect("2023-03-30", "2023-10-01")
 
     existing = pd.read_csv("data/raw/mlb_games.csv")
-    result = pd.concat([existing, df_2025], ignore_index=True)
+    df_2025 = existing[existing["game_date"] >= "2025-01-01"]
+
+    result = pd.concat([df_2023, df_2025], ignore_index=True)
     result.to_csv("data/raw/mlb_games.csv", index=False)
     print(f"\n완료: 총 {len(result)}경기 저장 → data/raw/mlb_games.csv")
-    print(f"  2023: {len(existing)}경기 + 2025: {len(df_2025)}경기")
+    print(f"  2023: {len(df_2023)}경기 + 2025: {len(df_2025)}경기")
