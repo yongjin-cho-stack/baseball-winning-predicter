@@ -56,8 +56,8 @@ python src/data_loader.py
 # 모델 학습
 python src/train.py
 
-# 특정 날짜 경기 예측
-python src/predict.py --date 2025-07-01
+# 특정 날짜 경기 예측 (날짜를 직접 입력)
+python src/predict.py
 ```
 
 ## 결과
